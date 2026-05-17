@@ -39,12 +39,16 @@
         in
         {
           default = pkgs.mkShell {
-            packages = with pkgs; [ f3d blender ];
+            packages = with pkgs; [ f3d blender unzip python3 ];
 
             shellHook = ''
               export BLENDER_USER_SCRIPTS="$PWD/.blender-scripts"
               mkdir -p "$BLENDER_USER_SCRIPTS/addons"
               ln -sfn "${mmd_tools}/mmd_tools" "$BLENDER_USER_SCRIPTS/addons/mmd_tools"
+
+              pmx_fs_to_glb() {
+                python3 "$PWD/pmx_fs_to_glb.py" "$@"
+              }
             '';
           };
         }
