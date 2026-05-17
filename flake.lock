@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "mmd_tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778638754,
+        "narHash": "sha256-vSCIQvOvYlMeF4PHdqheK1q9+O0T6SVcwCtgBQ8abnI=",
+        "owner": "MMD-Blender",
+        "repo": "blender_mmd_tools",
+        "rev": "64db7d4d6e83e0e7a38f7ea9da7dc51019813250",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MMD-Blender",
+        "repo": "blender_mmd_tools",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1778869304,
@@ -18,6 +34,7 @@
     },
     "root": {
       "inputs": {
+        "mmd_tools": "mmd_tools",
         "nixpkgs": "nixpkgs"
       }
     }
