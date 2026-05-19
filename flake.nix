@@ -1,5 +1,5 @@
 {
-  description = "Flake providing f3d and blender CLI with mmd_tools";
+  description = "Flake providing blender CLI with mmd_tools";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -25,10 +25,8 @@
         in
         {
           default = pkgs.buildEnv {
-            name = "f3d-blender-env";
-            paths = with pkgs; [ f3d blender ];
+            paths = with pkgs; [ blender ];
           };
-          f3d = pkgs.f3d;
           blender = pkgs.blender;
         }
       );
@@ -48,6 +46,9 @@
 
               pmx_fs_to_glb() {
                 python3 "$PWD/pmx_fs_to_glb.py" "$@"
+              }
+              blender_gltf() {
+                blender --python-expr "import bpy; bpy.ops.import_scene.gltf(filepath='$1')"
               }
             '';
           };

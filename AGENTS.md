@@ -2,13 +2,13 @@
 
 ## Entrypoint
 
-- `pmx_fs_to_glb` (shell function) — batch converts `.pmx.zip` files to `.glb`
+- `pmx_fs_to_glb` (shell function) — batch converts `.pmx.zip` files to separated `.gltf`
 - `nix develop` to enter the dev shell, then use the command
 
 ## Key files
 
-- `pmx_fs_to_glb.py` — orchestrator: unzips, calls Blender per file, mirrors input dir hierarchy under `glb/`
-- `convert_pmx_to_glb.py` — Blender script: imports PMX via `mmd_tools`, converts materials to Principled BSDF, exports GLB
+- `pmx_fs_to_glb.py` — orchestrator: unzips, calls Blender per file, mirrors input dir hierarchy under `gltf/`
+- `convert_pmx_to_glb.py` — Blender script: imports PMX via `mmd_tools`, converts materials to Principled BSDF, exports separated GLTF
 - `flake.nix` — provides `blender`, `f3d`, `unzip`, `python3`, and the `mmd_tools` addon
 
 ## Critical gotchas
@@ -23,5 +23,5 @@
 ```sh
 nix develop
 pmx_fs_to_glb models/charA.pmx.zip models/charB.pmx.zip
-# Produces glb/models/charA.glb, glb/models/charB.glb
+# Produces gltf/models/charA.gltf, gltf/models/charB.gltf (each with .bin + textures/)
 ```

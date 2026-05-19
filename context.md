@@ -1,16 +1,16 @@
-# PMX → GLB conversion pipeline (output files are `.glb`, default output directory is `glb/`)
+# PMX → GLTF conversion pipeline (output files are `.gltf`, default output directory is `gltf/`)
 
-## Problem 1: need a script to convert PMX files to viewable glb
+## Problem 1: need a script to convert PMX files to viewable glTF
 
-**Need**: Convert MikuMikuDance `.pmx` models (often distributed as `.pmx.zip` bundles containing mesh + textures) to GLB format for viewing with `f3d`.
+**Need**: Convert MikuMikuDance `.pmx` models (often distributed as `.pmx.zip` bundles containing mesh + textures) to GLTF format for viewing with `f3d`.
 
 **Solution**:
-- `pmx_fs_to_glb.py` — orchestrator that takes one or more `.pmx.zip` files, extracts each to a temp dir, calls Blender CLI per-file, and mirrors the input directory hierarchy under an output root (default `glb/`).
-- `convert_pmx_to_glb.py` — Blender Python script that imports the PMX via the `mmd_tools` addon and exports as GLB.
+- `pmx_fs_to_glb.py` — orchestrator that takes one or more `.pmx.zip` files, extracts each to a temp dir, calls Blender CLI per-file, and mirrors the input directory hierarchy under an output root (default `gltf/`).
+- `convert_pmx_to_glb.py` — Blender Python script that imports the PMX via the `mmd_tools` addon and exports as separated GLTF (`.gltf` + `.bin` + `textures/`).
 - `flake.nix` — Nix flake providing `blender`, `f3d`, `unzip`, `python3`, and the `mmd_tools` Blender addon (fetched from GitHub, `flake = false` since it's not a Nix project).
 - `pmx2glb` was first attempted as a shell function but replaced by `pmx_fs_to_glb` to support batch processing and hierarchy mirroring.
 
-Each input ZIP becomes a `.glb` file mirroring the input path hierarchy under `glb/`.
+Each input ZIP becomes a `.gltf` file mirroring the input path hierarchy under `gltf/`, accompanied by a `.bin` file and a `textures/` directory.
 
 **Usage**: `nix develop` then `pmx_fs_to_glb models/charA.pmx.zip models/charB.pmx.zip`
 
@@ -18,19 +18,19 @@ Each input ZIP becomes a `.glb` file mirroring the input path hierarchy under `g
 
 ## Problem 2: f3d "failed to load scene"
 
-**Need**: f3d refuses to open the exported `.glb` files with `failed to load scene`.
+**Need**: f3d refuses to open the exported files with `failed to load scene`.
 
-**Solution**: VTK's glb reader (used by f3d) cannot handle glb morph targets. MMD models use morph targets extensively for facial expressions, and the default Blender glb export includes them.
+**Solution**: VTK's glTF reader (used by f3d) cannot handle morph targets. MMD models use morph targets extensively for facial expressions, and the default Blender glTF export includes them.
 
-**Fix**: Set `export_morph=False` in the glb export call.
+**Fix**: Set `export_morph=False` in the glTF export call.
 
 ---
 
-## Problem 3: textures not included in the GLB
+## Problem 3: textures not included in the GLTF
 
-**Need**: The exported `.glb` files have mesh data but no textures (0 images in the GLB).
+**Need**: The exported models have mesh data but no textures (0 images in the output).
 
-**Root cause 1** — custom shader nodes: `mmd_tools` creates materials with a custom `MMDShaderDev` node group, not the standard `Principled BSDF`. The glb exporter only recognizes standard node types, so it has no way to find the texture images.
+**Root cause 1** — custom shader nodes: `mmd_tools` creates materials with a custom `MMDShaderDev` node group, not the standard `Principled BSDF`. The glTF exporter only recognizes standard node types, so it has no way to find the texture images.
 
 **Root cause 2** — unloaded images: many texture files aren't loaded by `mmd_tools` during import, either because:
 - Case-sensitive filesystem: the PMX references `Tex/` but the ZIP has `tex/` (or vice versa)

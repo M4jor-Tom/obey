@@ -18,9 +18,9 @@ def find_pmx_in_zip(zip_path):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Convert PMX ZIPs to glb")
+    parser = argparse.ArgumentParser(description="Convert PMX ZIPs to separated glTF")
     parser.add_argument("zips", nargs="+", help="Input .pmx.zip files")
-    parser.add_argument("-o", "--output-dir", default="glb", help="Output directory (default: glb)")
+    parser.add_argument("-o", "--output-dir", default="gltf", help="Output directory (default: gltf)")
     args = parser.parse_args()
 
     blender_script = os.path.join(os.path.dirname(__file__), "convert_pmx_to_glb.py")
@@ -39,8 +39,9 @@ def main():
             rel_dir = zip_path.resolve().parent.relative_to(Path.cwd())
         except ValueError:
             rel_dir = Path(".")
-        out_name = zip_path.stem.removesuffix(".pmx") + ".glb"
-        out_path = Path(args.output_dir) / rel_dir / out_name
+        stem = zip_path.stem.removesuffix(".pmx")
+        out_name = stem + ".gltf"
+        out_path = Path(args.output_dir) / rel_dir / stem / out_name
         out_path.parent.mkdir(parents=True, exist_ok=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
