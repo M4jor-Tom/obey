@@ -97,5 +97,4 @@ bpy.ops.object.select_all(action="SELECT")
 bpy.ops.export_scene.gltf(
     filepath=output_path,
     use_selection=True,
-    export_morph=False,
 )
