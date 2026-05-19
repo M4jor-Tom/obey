@@ -44,8 +44,8 @@
               mkdir -p "$BLENDER_USER_SCRIPTS/addons"
               ln -sfn "${mmd_tools}/mmd_tools" "$BLENDER_USER_SCRIPTS/addons/mmd_tools"
 
-              pmx_fs_to_glb() {
-                python3 "$PWD/pmx_fs_to_glb.py" "$@"
+              pmx_fs_to_gltf() {
+                python3 "$PWD/pmx_fs_to_gltf.py" "$@"
               }
               blender_gltf() {
                 blender --python-expr "import bpy; bpy.ops.import_scene.gltf(filepath='$1')"

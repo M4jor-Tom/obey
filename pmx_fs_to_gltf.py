@@ -23,7 +23,7 @@ def main():
     parser.add_argument("-o", "--output-dir", default="gltf", help="Output directory (default: gltf)")
     args = parser.parse_args()
 
-    blender_script = os.path.join(os.path.dirname(__file__), "convert_pmx_to_glb.py")
+    blender_script = os.path.join(os.path.dirname(__file__), "convert_pmx_to_gltf.py")
 
     for zip_path_str in args.zips:
         zip_path = Path(zip_path_str)
