@@ -2,12 +2,13 @@
 
 ## Entrypoint
 
-- `pmx_fs_to_gltf` (shell function) — batch converts `.pmx.zip` files to separated `.gltf`
-- `nix develop` to enter the dev shell, then use the command
+- `nix run . -- -i <input> -o <output>` — converts a PMX model or archive to separated `.gltf`
+- `pmx_fs_to_gltf` (shell function, inside `nix develop`) — same
+- `nix develop` to enter the dev shell, then use the shell function
 
 ## Key files
 
-- `pmx_fs_to_gltf.py` — orchestrator: unzips, calls Blender per file, mirrors input dir hierarchy under `gltf/`
+- `pmx_fs_to_gltf.py` — orchestrator: resolves input (archive/directory/.pmx), finds the single `.pmx`, calls Blender, writes report
 - `convert_pmx_to_gltf.py` — Blender script: imports PMX via `mmd_tools`, converts materials to Principled BSDF, exports separated GLTF
 - `flake.nix` — provides `blender`, `f3d`, `unzip`, `python3`, and the `mmd_tools` addon
 
@@ -21,7 +22,16 @@
 ## Usage
 
 ```sh
+# Direct (no dev shell needed)
+nix run . -- -i models/charA.pmx.zip -o charA.gltf
+nix run . -- -i charA.pmx -o charA.gltf.zip
+nix run . -- -i extracted_dir/ -o charA.gltf.tar.gz -r report.json
+
+# Or via dev shell
 nix develop
-pmx_fs_to_gltf models/charA.pmx.zip models/charB.pmx.zip
-# Produces gltf/models/charA.gltf, gltf/models/charB.gltf (each with .bin + textures/)
+pmx_fs_to_gltf -i models/charA.pmx.zip -o charA.gltf
+pmx_fs_to_gltf -i charA.pmx -o charA.gltf
+pmx_fs_to_gltf -i extracted_dir/ -o charA.gltf.zip -r report.json
+
+# Output is always a directory (<name>.gltf/) or an archive containing one
 ```

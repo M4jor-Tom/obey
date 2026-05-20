@@ -5,14 +5,10 @@
 **Need**: Convert MikuMikuDance `.pmx` models (often distributed as `.pmx.zip` bundles containing mesh + textures) to GLTF format for viewing with `f3d`.
 
 **Solution**:
-- `pmx_fs_to_gltf.py` — orchestrator that takes one or more `.pmx.zip` files, extracts each to a temp dir, calls Blender CLI per-file, and mirrors the input directory hierarchy under an output root (default `gltf/`).
+- `pmx_fs_to_gltf.py` — orchestrator: resolves input (archive/directory/.pmx), finds the single `.pmx`, calls Blender, writes report.
 - `convert_pmx_to_gltf.py` — Blender Python script that imports the PMX via the `mmd_tools` addon and exports as separated GLTF (`.gltf` + `.bin` + `textures/`).
 - `flake.nix` — Nix flake providing `blender`, `f3d`, `unzip`, `python3`, and the `mmd_tools` Blender addon (fetched from GitHub, `flake = false` since it's not a Nix project).
-- `pmx2gltf` was first attempted as a shell function but replaced by `pmx_fs_to_gltf` to support batch processing and hierarchy mirroring.
-
-Each input ZIP becomes a `.gltf` file mirroring the input path hierarchy under `gltf/`, accompanied by a `.bin` file and a `textures/` directory.
-
-**Usage**: `nix develop` then `pmx_fs_to_gltf models/charA.pmx.zip models/charB.pmx.zip`
+**Usage**: `nix develop` then `pmx_fs_to_gltf -i <input> -o <output> [-r report.json]`
 
 ---
 
@@ -59,5 +55,5 @@ Each input ZIP becomes a `.gltf` file mirroring the input path hierarchy under `
 
 **Solution**: The shell function `pmx_fs_to_gltf` delegates to Python, and argparse handles usage messages automatically:
 ```
-usage: pmx_fs_to_gltf.py [-h] [-o OUTPUT_DIR] zips [zips ...]
+usage: pmx_fs_to_gltf.py [-h] -i INPUT -o OUTPUT [-r REPORT]
 ```

@@ -44,13 +44,30 @@
               mkdir -p "$BLENDER_USER_SCRIPTS/addons"
               ln -sfn "${mmd_tools}/mmd_tools" "$BLENDER_USER_SCRIPTS/addons/mmd_tools"
 
-              pmx_fs_to_gltf() {
-                python3 "$PWD/pmx_fs_to_gltf.py" "$@"
-              }
-              blender_gltf() {
-                blender --python-expr "import bpy; bpy.ops.import_scene.gltf(filepath='$1')"
+              pmx_to_gltf() {
+                python3 "$PWD/pmx_to_gltf.py" "$@"
               }
             '';
+          };
+        }
+      );
+
+      apps = forAllSystems (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default = {
+            type = "app";
+            program = "${pkgs.writeShellScriptBin "pmx_to_gltf" ''
+              set -e
+              BLENDER_SCRIPTS="$(mktemp -d)"
+              mkdir -p "$BLENDER_SCRIPTS/addons"
+              ln -sfn "${mmd_tools}/mmd_tools" "$BLENDER_SCRIPTS/addons/mmd_tools"
+              export BLENDER_USER_SCRIPTS="$BLENDER_SCRIPTS"
+              export PATH="${pkgs.blender}/bin:${pkgs.python3}/bin:$PATH"
+              exec python3 "${./.}/pmx_to_gltf.py" "$@"
+            ''}/bin/pmx_to_gltf";
           };
         }
       );
