@@ -101,6 +101,11 @@ def _create_case_symlinks(tmpdir: str):
                 os.symlink(name, os.path.join(tmpdir, upper))
 
 
+def _symlink_dir_contents(src: str, dst: str):
+    for name in os.listdir(src):
+        os.symlink(os.path.join(src, name), os.path.join(dst, name))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Convert a PMX model to separated glTF")
     parser.add_argument("-i", "--input", required=True,
@@ -143,6 +148,11 @@ def main():
     else:
         print(f"Error: {input_path} not found", file=sys.stderr)
         sys.exit(1)
+
+    if tmpdir_cleanup is None:
+        tmpdir_cleanup = tempfile.TemporaryDirectory()
+        _symlink_dir_contents(work_dir, tmpdir_cleanup.name)
+        work_dir = tmpdir_cleanup.name
 
     pmx_full, pmx_count = _find_pmx_in_dir(work_dir)
     gltf_stem = os.path.splitext(os.path.basename(gltf_dir_name))[0]
